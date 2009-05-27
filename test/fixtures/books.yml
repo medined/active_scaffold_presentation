@@ -1,0 +1,25 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  person_id: 1
+  name: MyString
+  pages: 1
+  price: 1.5
+  invoiced_at: 2009-05-25 23:53:34
+  purchased_on: 2009-05-25
+  paid_at: 2009-05-25 23:53:34
+  checkin: 2009-05-25 23:53:34
+  description: MyText
+  paperback: false
+
+two:
+  person_id: 1
+  name: MyString
+  pages: 1
+  price: 1.5
+  invoiced_at: 2009-05-25 23:53:34
+  purchased_on: 2009-05-25
+  paid_at: 2009-05-25 23:53:34
+  checkin: 2009-05-25 23:53:34
+  description: MyText
+  paperback: false
