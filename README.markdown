@@ -2,6 +2,8 @@
 
 ## First Phase
 
+In this phase we'll create a simple scaffold with a single field.
+
 1. Connect to working directory:
         cd Workspaces
 
@@ -77,103 +79,107 @@
 13, Review the show create, edit, show, search, delete options.
 
 ## Second Phase 
-  
--------------------------- 10 minute mark
 
--------- a look at other data types.
+This phase of the project will use nearly all of the datatypes that ActiveScaffold supports. 
 
-4. create a books model (all datatypes except for binary)
-script/generate model book person_id:integer name:string pages:integer price:float invoiced_at:datetime purchased_on:date paid_at:timestamp checkin:time description:text paperback:boolean
+1. Create a books model (all datatypes except for binary)
+        script/generate model book person_id:integer name:string pages:integer price:float invoiced_at:datetime purchased_on:date paid_at:timestamp checkin:time description:text paperback:boolean
 
-5. Update the database.
-rake db:migrate
+2. Update the database.
+        rake db:migrate
 
-6. edit app/models/book.rb to add relation to person.
-belongs_to :person
+3. Edit app/models/book.rb to add relation to person.
+        belongs_to :person
 
-7. edit app/models/person.rb to add relation to books.
-has_many :books
+4. edit app/models/person.rb to add relation to books.
+        has_many :books
 
-8. create app/controllers/book_controller.rb
-class BookController < ApplicationController
-  layout 'default'
-  active_scaffold :book
-end
+5. Create app/controllers/book_controller.rb
+        class BookController < ApplicationController
+          layout 'default'
+          active_scaffold :book
+        end
 
-9. start a server in a new terminal unless it is running
-script/server
+6. start a server in a new terminal unless it is running
+        script/server
 
-10. visit book page.
-http://localhost:3000/book
+7. visit book page.
+        http://localhost:3000/book
 
-11. Create and edit a book. Too many fields and the order is uncontrolled.
+8. Create and edit a book. You'll see too many fields and the order is uncontrolled.
 The 'person' field should be titled 'Owners'.
 
-12. Hide some of the book fields.
-vim app/controllers/book_controller.rb
-  active_scaffold :book do |config|
-    config.create.columns = [ :name, :paperback, :price ]
-  end
+12. Edit app/controllers/book_controller.rb to hide some of the book fields and rename 'person' to 'Owner'.
+        active_scaffold :book do |config|
+          config.create.columns = [ :name, :paperback, :price ]
+          config.columns[:person].label = "Owner" 
+        end
 
 13. Reload the book page. Notice the server does not need to be restarted.
 
-14. Create some books. (create a rake task?)
+14. Create some books. Normally, I'd create a rake task to initialize test data.
 
-15. visit person page.
-http://localhost:3000/person
+15. Visit the person page.
+        http://localhost:3000/person
 
-16. click edit. notice the option to select an existing book or 
+16. The field order is not good. Edit app/controllers/person_controller.rb to fix this. 
+        class PersonController < ApplicationController
+          layout 'default'
+          active_scaffold :person do |config|
+            config.list.columns = [ :name, :books ]
+          end
+        end
+
+17. Click edit. Notice the option to select an existing book or 
 enter a new one. Notice that the person form
 has only a name field, all the other fields are book fields.
 
-17. Restrict user to only existing books. Note the plural needs to be used.
-vim app/controllers/person_controller.rb
-  active_scaffold :person do |config|
-    config.columns[:books].form_ui = :select
-  end
+18. Edit app/controllers/person_controller.rb to restrict user to only existing books. Note the plural needs to be used.
+        active_scaffold :person do |config|
+          config.columns[:books].form_ui = :select
+        end
 
-18. Reload person page. Edit a person. Associate books to person. Since
+19. Reload person page. Edit a person. Associate books to person. Since
 a book belongs_to a person, once it has been assigned it can't be 
 assigned to another person.
 
-19. Click on books link, show subform. 
-20. Too many fields in subform. Update the list fields.
-vim app/controllers/book_controller.rb
-  active_scaffold :book do |config|
-    config.list.columns = [ :name, :description, :paperback, :price ]
-  end
+20. Click on books link, show subform. 
 
-21. Reload and click on books link. Notice fewer columns.
+21. Too many fields in subform. Edit app/controllers/book_controller.rb to restrict the list fields.
+        active_scaffold :book do |config|
+          config.list.columns = [ :name, :description, :paperback, :price ]
+        end
+22. Reload and click on books link. Notice fewer columns.
 
-22. Let's prevent deletions of books.
-vim app/controllers/book_controller.rb
-  def delete_authorized?
-    false
-  end
+23. Let's prevent book deletion. Edit app/controllers/book_controller.rb
+        def delete_authorized?
+          false
+        end
 
-23. Reload and click on books link. Notice the delete link is gone.
+24. Reload and click on books link. Notice the delete link is gone.
 
--------------------------- 20 minute mark
+## Third Phase 
 
 Time to fix the problem of ugly dates. There are several options
 but we'll add a new function to the ActiveSupport::TimeWithZone class.
 
-1. Update application.rb. Notice how bad I am with method names.
-class ActiveSupport::TimeWithZone
-  def format_short_date
-    self.strftime("%m/%d/%Y")
-  end
-end
+1. Edit app/controllers/application.rb.
+        class ActiveSupport::TimeWithZone
+          def format_short_date
+            self.strftime("%m/%d/%Y")
+          end
+        end
 
-2. Create app/helpers/person_helpers.rb. 
-class PersonHelper
-  def updated_at_column(record)
-    if record.updated_at.respond_to? :format_short_date
-      record.updated_at.format_short_date
-    else
-      record.updated_at
-    end
-  end
+2. Create a app/helpers/person_helpers.rb file. 
+        class PersonHelper
+          def updated_at_column(record)
+            if record.updated_at.respond_to? :format_short_date
+              record.updated_at.format_short_date
+            else
+              record.updated_at
+            end
+          end
+        end
 
 Notice that books is also affected.
 
@@ -282,3 +288,4 @@ virtualbox &
   Downloaded Ubuntu 8.10 Desktop ISO file.
 
 
+git push origin master
