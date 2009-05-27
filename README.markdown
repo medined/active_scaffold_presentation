@@ -1,62 +1,83 @@
 # Active Scaffold Presentation
 
+## First Phase
+
 1. Connect to working directory:
         cd Workspaces
 
 2. Create a new Rails project:
         rails camur
 
-# Connect to project directory.
+3. Connect to project directory:
+        cd camur
 
-bc.. cd camur
+4. copy plugin:
+        cp -R ~/support/active_scaffold vendor/plugins
 
-# Copy plugin.
+5. Create app/models/person.rb:
+        class Person < ActiveRecord::Base
+        end
 
-bc.. cp -R ~/support/active_scaffold vendor/plugins
+6. Create a migration:
+        script/generate migration create_people
 
-2. create app/models/person.rb
-class Person < ActiveRecord::Base
-end
+7. Update migration to match the following:
+        class CreatePeople < ActiveRecord::Migration
+          def self.up
+            create_table :people do |t|
+              t.string :name
+              t.timestamps
+            end
+          end
+        
+          def self.down
+            drop_table :people
+          end
+        end
 
-3. create a migration
-script/generate migration create_people
+8. Execute the migration:
+        rake db:migrate
 
-4. update migration to
-class CreatePeople < ActiveRecord::Migration
-  def self.up
-    create_table :people do |t|
-      t.string :name
-      t.timestamps
-    end
-  end
+9. Create app/controllers/person_controller.rb:
+        class PersonController < ApplicationController
+          layout 'default'
+          active_scaffold :person
+        end
 
-  def self.down
-    drop_table :people
-  end
-end
+10. Create a default layout:
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+          <meta http-equiv="Content-Type" content="text/html;.  charset=iso-8859-1" />
+          <meta http-equiv="Content-Language" content="en-us" />
+          <title>Presentation</title>
+          <%= stylesheet_link_tag "style" %>
+          <%= javascript_include_tag :defaults %>
+          <%= active_scaffold_includes %>
+        </head>
+        <body id="page">
+          <div id="container">
+          <div id="header">
+            <h1>CAMUR</h1>
+          </div>
+          <div id="content">
+            <%= yield -%>
+          </div>
+          <div id="sidebar"></div>
+          </div>
+        </body>
+        </html>
 
-5. migrate.
-rake db:migrate
+11. Start a server in a new terminal.
+        script/server
 
-6. create app/controllers/person_controller.rb
-class PersonController < ApplicationController
-  layout 'default'
-  active_scaffold :person
-end
+12. Visit person page.
+        http://localhost:3000/person
 
-7. create a layout with the following.
-cp ~/Workspaces/default.erb ./app/views/layouts
-<%= javascript_include_tag :defaults %>
-<%= active_scaffold_includes %>
+13, Review the show create, edit, show, search, delete options.
 
-8. start a server in a new terminal.
-script/server
-
-9. visit person page.
-http://localhost:3000/person
-
-10, show create, edit, show, search, delete
-
+## Second Phase 
+  
 -------------------------- 10 minute mark
 
 -------- a look at other data types.
