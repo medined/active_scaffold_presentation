@@ -1,256 +1,261 @@
-== Welcome to Rails
+h1. Active Scaffold Presentation
 
-Rails is a web-application framework that includes everything needed to create 
-database-backed web applications according to the Model-View-Control pattern. 
+# Connect to working directory.
+bc. cd Workspaces
 
-This pattern splits the view (also called the presentation) into "dumb" templates
-that are primarily responsible for inserting pre-built data in between HTML tags.
-The model contains the "smart" domain objects (such as Account, Product, Person,
-Post) that holds all the business logic and knows how to persist themselves to
-a database. The controller handles the incoming requests (such as Save New Account,
-Update Product, Show Post) by manipulating the model and directing data to the view.
+# Create a new Rails project.
+bc. rails camur
 
-In Rails, the model is handled by what's called an object-relational mapping
-layer entitled Active Record. This layer allows you to present the data from
-database rows as objects and embellish these data objects with business logic
-methods. You can read more about Active Record in
-link:files/vendor/rails/activerecord/README.html.
+# Connect to project directory.
+bc. cd camur
 
-The controller and view are handled by the Action Pack, which handles both
-layers by its two parts: Action View and Action Controller. These two layers
-are bundled in a single package due to their heavy interdependence. This is
-unlike the relationship between the Active Record and Action Pack that is much
-more separate. Each of these packages can be used independently outside of
-Rails.  You can read more about Action Pack in
-link:files/vendor/rails/actionpack/README.html.
+# Copy plugin.
+bc. cp -R ~/support/active_scaffold vendor/plugins
 
+2. create app/models/person.rb
+class Person < ActiveRecord::Base
+end
 
-== Getting Started
+3. create a migration
+script/generate migration create_people
 
-1. At the command prompt, start a new Rails application using the <tt>rails</tt> command
-   and your application name. Ex: rails myapp
-2. Change directory into myapp and start the web server: <tt>script/server</tt> (run with --help for options)
-3. Go to http://localhost:3000/ and get "Welcome aboard: You're riding the Rails!"
-4. Follow the guidelines to start developing your application
-
-
-== Web Servers
-
-By default, Rails will try to use Mongrel and lighttpd if they are installed, otherwise
-Rails will use WEBrick, the webserver that ships with Ruby. When you run script/server,
-Rails will check if Mongrel exists, then lighttpd and finally fall back to WEBrick. This ensures
-that you can always get up and running quickly.
-
-Mongrel is a Ruby-based webserver with a C component (which requires compilation) that is
-suitable for development and deployment of Rails applications. If you have Ruby Gems installed,
-getting up and running with mongrel is as easy as: <tt>gem install mongrel</tt>.
-More info at: http://mongrel.rubyforge.org
-
-If Mongrel is not installed, Rails will look for lighttpd. It's considerably faster than
-Mongrel and WEBrick and also suited for production use, but requires additional
-installation and currently only works well on OS X/Unix (Windows users are encouraged
-to start with Mongrel). We recommend version 1.4.11 and higher. You can download it from
-http://www.lighttpd.net.
-
-And finally, if neither Mongrel or lighttpd are installed, Rails will use the built-in Ruby
-web server, WEBrick. WEBrick is a small Ruby web server suitable for development, but not
-for production.
-
-But of course its also possible to run Rails on any platform that supports FCGI.
-Apache, LiteSpeed, IIS are just a few. For more information on FCGI,
-please visit: http://wiki.rubyonrails.com/rails/pages/FastCGI
-
-
-== Apache .htaccess example
-
-# General Apache options
-AddHandler fastcgi-script .fcgi
-AddHandler cgi-script .cgi
-Options +FollowSymLinks +ExecCGI
-
-# If you don't want Rails to look in certain directories,
-# use the following rewrite rules so that Apache won't rewrite certain requests
-# 
-# Example:
-#   RewriteCond %{REQUEST_URI} ^/notrails.*
-#   RewriteRule .* - [L]
-
-# Redirect all requests not available on the filesystem to Rails
-# By default the cgi dispatcher is used which is very slow
-# 
-# For better performance replace the dispatcher with the fastcgi one
-#
-# Example:
-#   RewriteRule ^(.*)$ dispatch.fcgi [QSA,L]
-RewriteEngine On
-
-# If your Rails application is accessed via an Alias directive,
-# then you MUST also set the RewriteBase in this htaccess file.
-#
-# Example:
-#   Alias /myrailsapp /path/to/myrailsapp/public
-#   RewriteBase /myrailsapp
-
-RewriteRule ^$ index.html [QSA]
-RewriteRule ^([^.]+)$ $1.html [QSA]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ dispatch.cgi [QSA,L]
-
-# In case Rails experiences terminal errors
-# Instead of displaying this message you can supply a file here which will be rendered instead
-# 
-# Example:
-#   ErrorDocument 500 /500.html
-
-ErrorDocument 500 "<h2>Application error</h2>Rails application failed to start properly"
-
-
-== Debugging Rails
-
-Sometimes your application goes wrong.  Fortunately there are a lot of tools that
-will help you debug it and get it back on the rails.
-
-First area to check is the application log files.  Have "tail -f" commands running
-on the server.log and development.log. Rails will automatically display debugging
-and runtime information to these files. Debugging info will also be shown in the
-browser on requests from 127.0.0.1.
-
-You can also log your own messages directly into the log file from your code using
-the Ruby logger class from inside your controllers. Example:
-
-  class WeblogController < ActionController::Base
-    def destroy
-      @weblog = Weblog.find(params[:id])
-      @weblog.destroy
-      logger.info("#{Time.now} Destroyed Weblog ID ##{@weblog.id}!")
+4. update migration to
+class CreatePeople < ActiveRecord::Migration
+  def self.up
+    create_table :people do |t|
+      t.string :name
+      t.timestamps
     end
   end
 
-The result will be a message in your log file along the lines of:
+  def self.down
+    drop_table :people
+  end
+end
 
-  Mon Oct 08 14:22:29 +1000 2007 Destroyed Weblog ID #1
+5. migrate.
+rake db:migrate
 
-More information on how to use the logger is at http://www.ruby-doc.org/core/
+6. create app/controllers/person_controller.rb
+class PersonController < ApplicationController
+  layout 'default'
+  active_scaffold :person
+end
 
-Also, Ruby documentation can be found at http://www.ruby-lang.org/ including:
+7. create a layout with the following.
+cp ~/Workspaces/default.erb ./app/views/layouts
+<%= javascript_include_tag :defaults %>
+<%= active_scaffold_includes %>
 
-* The Learning Ruby (Pickaxe) Book: http://www.ruby-doc.org/docs/ProgrammingRuby/
-* Learn to Program: http://pine.fm/LearnToProgram/  (a beginners guide)
+8. start a server in a new terminal.
+script/server
 
-These two online (and free) books will bring you up to speed on the Ruby language
-and also on programming in general.
+9. visit person page.
+http://localhost:3000/person
 
+10, show create, edit, show, search, delete
 
-== Debugger
+-------------------------- 10 minute mark
 
-Debugger support is available through the debugger command when you start your Mongrel or
-Webrick server with --debugger. This means that you can break out of execution at any point
-in the code, investigate and change the model, AND then resume execution! 
-You need to install ruby-debug to run the server in debugging mode. With gems, use 'gem install ruby-debug'
-Example:
+-------- a look at other data types.
 
-  class WeblogController < ActionController::Base
-    def index
-      @posts = Post.find(:all)
-      debugger
+4. create a books model (all datatypes except for binary)
+script/generate model book person_id:integer name:string pages:integer price:float invoiced_at:datetime purchased_on:date paid_at:timestamp checkin:time description:text paperback:boolean
+
+5. Update the database.
+rake db:migrate
+
+6. edit app/models/book.rb to add relation to person.
+belongs_to :person
+
+7. edit app/models/person.rb to add relation to books.
+has_many :books
+
+8. create app/controllers/book_controller.rb
+class BookController < ApplicationController
+  layout 'default'
+  active_scaffold :book
+end
+
+9. start a server in a new terminal unless it is running
+script/server
+
+10. visit book page.
+http://localhost:3000/book
+
+11. Create and edit a book. Too many fields and the order is uncontrolled.
+The 'person' field should be titled 'Owners'.
+
+12. Hide some of the book fields.
+vim app/controllers/book_controller.rb
+  active_scaffold :book do |config|
+    config.create.columns = [ :name, :paperback, :price ]
+  end
+
+13. Reload the book page. Notice the server does not need to be restarted.
+
+14. Create some books. (create a rake task?)
+
+15. visit person page.
+http://localhost:3000/person
+
+16. click edit. notice the option to select an existing book or 
+enter a new one. Notice that the person form
+has only a name field, all the other fields are book fields.
+
+17. Restrict user to only existing books. Note the plural needs to be used.
+vim app/controllers/person_controller.rb
+  active_scaffold :person do |config|
+    config.columns[:books].form_ui = :select
+  end
+
+18. Reload person page. Edit a person. Associate books to person. Since
+a book belongs_to a person, once it has been assigned it can't be 
+assigned to another person.
+
+19. Click on books link, show subform. 
+20. Too many fields in subform. Update the list fields.
+vim app/controllers/book_controller.rb
+  active_scaffold :book do |config|
+    config.list.columns = [ :name, :description, :paperback, :price ]
+  end
+
+21. Reload and click on books link. Notice fewer columns.
+
+22. Let's prevent deletions of books.
+vim app/controllers/book_controller.rb
+  def delete_authorized?
+    false
+  end
+
+23. Reload and click on books link. Notice the delete link is gone.
+
+-------------------------- 20 minute mark
+
+Time to fix the problem of ugly dates. There are several options
+but we'll add a new function to the ActiveSupport::TimeWithZone class.
+
+1. Update application.rb. Notice how bad I am with method names.
+class ActiveSupport::TimeWithZone
+  def format_short_date
+    self.strftime("%m/%d/%Y")
+  end
+end
+
+2. Create app/helpers/person_helpers.rb. 
+class PersonHelper
+  def updated_at_column(record)
+    if record.updated_at.respond_to? :format_short_date
+      record.updated_at.format_short_date
+    else
+      record.updated_at
     end
   end
 
-So the controller will accept the action, run the first line, then present you
-with a IRB prompt in the server window. Here you can do things like:
+Notice that books is also affected.
 
-  >> @posts.inspect
-  => "[#<Post:0x14a6be8 @attributes={\"title\"=>nil, \"body\"=>nil, \"id\"=>\"1\"}>,
-       #<Post:0x14a6620 @attributes={\"title\"=>\"Rails you know!\", \"body\"=>\"Only ten..\", \"id\"=>\"2\"}>]"
-  >> @posts.first.title = "hello from a debugger"
-  => "hello from a debugger"
+Change 'helper :all' in application.rb
 
-...and even better is that you can examine how your runtime objects actually work:
+Add 'helper PersonHelper' to PersonController.rb
 
-  >> f = @posts.first
-  => #<Post:0x13630c4 @attributes={"title"=>nil, "body"=>nil, "id"=>"1"}>
-  >> f.
-  Display all 152 possibilities? (y or n)
+!!!!!!!!!!!!!!!! Add Date Picker!!
 
-Finally, when you're ready to resume execution, you enter "cont"
+!!!!!!!!!!!!!!!! Create a custom scaffold of Paperback books.
+
+camur
 
 
-== Console
 
-You can interact with the domain model by starting the console through <tt>script/console</tt>.
-Here you'll have all parts of the application configured, just like it is when the
-application is running. You can inspect domain models, change values, and save to the
-database. Starting the script without arguments will launch it in the development environment.
-Passing an argument will specify a different environment, like <tt>script/console production</tt>.
 
-To reload your controllers and models after launching the console run <tt>reload!</tt>
+Start the VM
+-------------
+virtualbox &
 
-== dbconsole
+  USERID: as
+  PASSWORD: password
+  HOST KEY: RIGHT CONTROL
 
-You can go to the command line of your database directly through <tt>script/dbconsole</tt>.
-You would be connected to the database with the credentials defined in database.yml.
-Starting the script without arguments will connect you to the development database. Passing an
-argument will connect you to a different database, like <tt>script/dbconsole production</tt>.
-Currently works for mysql, postgresql and sqlite.
 
-== Description of Contents
+2009 Apr 02
+  Installed Ruby and RubyGems
+     # ruby
+    cd ~/rn
+    wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz
+    tar -xzvf ruby-1.9.1-p0.tar.gz
+    cd ~/rn/ruby-1.9.1-p0
+    ./configure
+    make
+    make test
+    sudo make install
+    # zlib
+    cd ~/rn/ruby-1.9.1-p0/ext/zlib
+    sudo apt-get install zlib1g-dev
+    ruby extconf.rb --with-zlib-include=/usr/include --with-zlib-lib=/usr/lib
+    make
+    sudo make install
+    # gem
+    cd ~/rn
+    wget http://rubyforge.org/frs/download.php/45905/rubygems-1.3.1.tgz
+    tar -xzvf rubygems-1.3.1.tgz
+    cd rubygems-1.3.1
+    sudo ruby setup.rb
+    # fix ruby executable
+    cd ~/rn/ruby-1.9.1-p0
+    sudo make install
 
-app
-  Holds all the code that's specific to this particular application.
+    rm ~/rn/ruby-1.9.1-p0.tar.gz
+    rm ~/rn/rubygems-1.3.1.tgz
 
-app/controllers
-  Holds controllers that should be named like weblogs_controller.rb for
-  automated URL mapping. All controllers should descend from ApplicationController
-  which itself descends from ActionController::Base.
 
-app/models
-  Holds models that should be named like post.rb.
-  Most models will descend from ActiveRecord::Base.
+    # rails
+    cd ~
+    vi .bashrc
+      PATH=$PATH:/home/as/.gem/ruby/1.9.1/bin
+      export PATH
+    source .bashrc
+    gem install rails
+    # git
+    sudo apt-get install git-core
 
-app/views
-  Holds the template files for the view that should be named like
-  weblogs/index.html.erb for the WeblogsController#index action. All views use eRuby
-  syntax.
+    # rspec
+    gem install rspec
+    gem install rspec-rails
+    # mysql
+    sudo apt-get install mysql-server-5.0
+      PASSWORD: password
+    # example application
+    git clone git://github.com/activefx/restful_authentication_tutorial.git rat
+    cd rat
+    git submodule init
+    git submodule update
+    cp config/database.yml.example config/database.yml
+    cp config/config.yml.example config/config.yml
+    rake db:create:all or db:create
+    rake db:migrate
 
-app/views/layouts
-  Holds the template files for layouts to be used with views. This models the common
-  header/footer method of wrapping views. In your views, define a layout using the
-  <tt>layout :default</tt> and create a file named default.html.erb. Inside default.html.erb,
-  call <% yield %> to render the view using this layout.
+  # Ruby Enterprise Edition
+  cd ~/rn
+  wget http://rubyforge.org/frs/download.php/51101/ruby-enterprise_1.8.6-20090201_i386.deb
+  sudo dpkg -i ruby-enterprise_1.8.6-20090201_i386.deb
+  rm ruby-enterprise_1.8.6-20090201_i386.deb
+  vi ~/.bashrc
+    PATH=$PATH:/opt/ruby-enterprise/bin
+    export PATH
+  sudo apt-get install build-essential
+  sudo apt-get install apache2-mpm-prefork
+  sudo apt-get install apache2-prefork-dev
+  sudo -s
+  /opt/ruby-enterprise/bin/passenger-install-apache2-module
+  exit
 
-app/helpers
-  Holds view helpers that should be named like weblogs_helper.rb. These are generated
-  for you automatically when using script/generate for controllers. Helpers can be used to
-  wrap functionality for your views into methods.
+    
+  Cloned VM
+    cd /home/medined/.VirtualBox/VDI
+    vboxmanage clonevdi ubuntu_8_10.vdi ruby.vdi
+  Updated VM.
 
-config
-  Configuration files for the Rails environment, the routing map, the database, and other dependencies.
+2009 Apr 01
+  Installed VirtualBox
+  Downloaded Ubuntu 8.10 Desktop ISO file.
 
-db
-  Contains the database schema in schema.rb.  db/migrate contains all
-  the sequence of Migrations for your schema.
 
-doc
-  This directory is where your application documentation will be stored when generated
-  using <tt>rake doc:app</tt>
-
-lib
-  Application specific libraries. Basically, any kind of custom code that doesn't
-  belong under controllers, models, or helpers. This directory is in the load path.
-
-public
-  The directory available for the web server. Contains subdirectories for images, stylesheets,
-  and javascripts. Also contains the dispatchers and the default HTML files. This should be
-  set as the DOCUMENT_ROOT of your web server.
-
-script
-  Helper scripts for automation and generation.
-
-test
-  Unit and functional tests along with fixtures. When using the script/generate scripts, template
-  test files will be generated for you and placed in this directory.
-
-vendor
-  External libraries that the application depends on. Also includes the plugins subdirectory.
-  If the app has frozen rails, those gems also go here, under vendor/rails/.
-  This directory is in the load path.
