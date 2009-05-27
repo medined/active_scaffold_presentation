@@ -2,19 +2,19 @@ h1. Active Scaffold Presentation
 
 # Connect to working directory.
 
-bc. cd Workspaces
+bc.. cd Workspaces
 
 # Create a new Rails project.
 
-bc. rails camur
+bc.. rails camur
 
 # Connect to project directory.
 
-bc. cd camur
+bc.. cd camur
 
 # Copy plugin.
 
-bc. cp -R ~/support/active_scaffold vendor/plugins
+bc.. cp -R ~/support/active_scaffold vendor/plugins
 
 2. create app/models/person.rb
 class Person < ActiveRecord::Base
