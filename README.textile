@@ -2,7 +2,7 @@ h1. Active Scaffold Presentation
 
 # Connect to working directory.
 
-bc.. cd Workspaces
+<pre>cd Workspaces</pre>
 
 # Create a new Rails project.
 
