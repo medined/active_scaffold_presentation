@@ -1,16 +1,10 @@
-<h1>Active Scaffold Presentation</h1>
+# Active Scaffold Presentation
 
-<ol>
-  <li>
-    Connect to working directory.
-    <pre>cd Workspaces</pre>
-  </li>
-  <li>
-    Create a new Rails project.
-    <pre>rails camur</pre>
-  </li>
-</ol>
+1. Connect to working directory:
+        cd Workspaces
 
+2. Create a new Rails project:
+        rails camur
 
 # Connect to project directory.
 
