@@ -83,7 +83,7 @@ In this phase we'll create a simple scaffold with a single field.
 This phase of the project will use nearly all of the datatypes that ActiveScaffold supports. 
 
 1. Create a books model (all datatypes except for binary)
-        script/generate model book person_id:integer name:string pages:integer price:float invoiced_at:datetime purchased_on:date paid_at:timestamp checkin:time description:text paperback:boolean
+<script src='http://pastie.org/492160.js'></script>
 
 2. Update the database.
         rake db:migrate
