@@ -122,11 +122,12 @@ The 'person' field should be titled 'Owners'.
 15. Visit the person page.
         http://localhost:3000/person
 
-16. The field order is not good. Edit app/controllers/person_controller.rb to fix this. 
+16. The field order is not good. Edit app/controllers/person_controller.rb to fix this.
+We'll change the date format later. 
         class PersonController < ApplicationController
           layout 'default'
           active_scaffold :person do |config|
-            config.list.columns = [ :name, :books ]
+            config.list.columns = [ :name, :books, :updated_at ]
           end
         end
 
@@ -147,7 +148,7 @@ assigned to another person.
 
 21. Too many fields in subform. Edit app/controllers/book_controller.rb to restrict the list fields.
         active_scaffold :book do |config|
-          config.list.columns = [ :name, :description, :paperback, :price ]
+          config.list.columns = [ :name, :description, :paperback, :price, :updated_at ]
         end
 22. Reload and click on books link. Notice fewer columns.
 
@@ -158,7 +159,7 @@ assigned to another person.
 
 24. Reload and click on books link. Notice the delete link is gone.
 
-## Third Phase 
+## Third Phase
 
 Time to fix the problem of ugly dates. There are several options
 but we'll add a new function to the ActiveSupport::TimeWithZone class.
@@ -171,7 +172,7 @@ but we'll add a new function to the ActiveSupport::TimeWithZone class.
         end
 
 2. Create a app/helpers/person_helpers.rb file. 
-        class PersonHelper
+        module PersonHelper
           def updated_at_column(record)
             if record.updated_at.respond_to? :format_short_date
               record.updated_at.format_short_date
@@ -181,111 +182,26 @@ but we'll add a new function to the ActiveSupport::TimeWithZone class.
           end
         end
 
-Notice that books is also affected.
+3. Edit app/helpers/person_helpers.rb by changing module to class to 
+demonstrate an error.
 
-Change 'helper :all' in application.rb
+4. Visit both the Person and Books pages to show that the helper module
+is loaded for both controllers.
 
-Add 'helper PersonHelper' to PersonController.rb
+5. Edit app/controllers/application.rb to comment out the 'helper :all' line.
+
+6. Reload the Books page to see that the helper module is no longer loaded. 
+
+7. Edit app/controllers/PersonController.rb to add the following line after
+the layout is defined.
+
+8. Now the updated_at field on the Person page is different from the Book page. 
+
+## Fourth Phase
 
 !!!!!!!!!!!!!!!! Add Date Picker!!
 
 !!!!!!!!!!!!!!!! Create a custom scaffold of Paperback books.
-
-camur
-
-
-
-
-Start the VM
--------------
-virtualbox &
-
-  USERID: as
-  PASSWORD: password
-  HOST KEY: RIGHT CONTROL
-
-
-2009 Apr 02
-  Installed Ruby and RubyGems
-     # ruby
-    cd ~/rn
-    wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz
-    tar -xzvf ruby-1.9.1-p0.tar.gz
-    cd ~/rn/ruby-1.9.1-p0
-    ./configure
-    make
-    make test
-    sudo make install
-    # zlib
-    cd ~/rn/ruby-1.9.1-p0/ext/zlib
-    sudo apt-get install zlib1g-dev
-    ruby extconf.rb --with-zlib-include=/usr/include --with-zlib-lib=/usr/lib
-    make
-    sudo make install
-    # gem
-    cd ~/rn
-    wget http://rubyforge.org/frs/download.php/45905/rubygems-1.3.1.tgz
-    tar -xzvf rubygems-1.3.1.tgz
-    cd rubygems-1.3.1
-    sudo ruby setup.rb
-    # fix ruby executable
-    cd ~/rn/ruby-1.9.1-p0
-    sudo make install
-
-    rm ~/rn/ruby-1.9.1-p0.tar.gz
-    rm ~/rn/rubygems-1.3.1.tgz
-
-
-    # rails
-    cd ~
-    vi .bashrc
-      PATH=$PATH:/home/as/.gem/ruby/1.9.1/bin
-      export PATH
-    source .bashrc
-    gem install rails
-    # git
-    sudo apt-get install git-core
-
-    # rspec
-    gem install rspec
-    gem install rspec-rails
-    # mysql
-    sudo apt-get install mysql-server-5.0
-      PASSWORD: password
-    # example application
-    git clone git://github.com/activefx/restful_authentication_tutorial.git rat
-    cd rat
-    git submodule init
-    git submodule update
-    cp config/database.yml.example config/database.yml
-    cp config/config.yml.example config/config.yml
-    rake db:create:all or db:create
-    rake db:migrate
-
-  # Ruby Enterprise Edition
-  cd ~/rn
-  wget http://rubyforge.org/frs/download.php/51101/ruby-enterprise_1.8.6-20090201_i386.deb
-  sudo dpkg -i ruby-enterprise_1.8.6-20090201_i386.deb
-  rm ruby-enterprise_1.8.6-20090201_i386.deb
-  vi ~/.bashrc
-    PATH=$PATH:/opt/ruby-enterprise/bin
-    export PATH
-  sudo apt-get install build-essential
-  sudo apt-get install apache2-mpm-prefork
-  sudo apt-get install apache2-prefork-dev
-  sudo -s
-  /opt/ruby-enterprise/bin/passenger-install-apache2-module
-  exit
-
-    
-  Cloned VM
-    cd /home/medined/.VirtualBox/VDI
-    vboxmanage clonevdi ubuntu_8_10.vdi ruby.vdi
-  Updated VM.
-
-2009 Apr 01
-  Installed VirtualBox
-  Downloaded Ubuntu 8.10 Desktop ISO file.
 
 
 git push origin master
