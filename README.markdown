@@ -27,7 +27,7 @@ In this phase we'll create a simple scaffold with a single field.
 7. Create the Person controller:
     script/generate controller person
 
-8. Create app/controllers/person_controller.rb:
+8. Edit app/controllers/person_controller.rb:
     class PersonController < ApplicationController
       layout 'default'
       active_scaffold :person
