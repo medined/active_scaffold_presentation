@@ -5,36 +5,36 @@
 In this phase we'll create a simple scaffold with a single field.
 
 1. Connect to working directory:
-        cd Workspaces
+    cd Workspaces
 
 2. Create a new Rails project:
-        sudo rails camur
-        chown -R medined:medined camur
+    sudo rails camur
+    sudo chown -R medined:medined camur
 
 3. Connect to project directory:
-        cd camur
+    cd camur
 
-4. copy plugin:
-        cp -R ~/support/render_component vendor/plugins
-        cp -R ~/support/active_scaffold vendor/plugins
+4. install plugins:
+    script/plugin install git://github.com/lackac/render_component.git -r rails-edge
+    script/plugin install git://github.com/activescaffold/active_scaffold.git
 
 5. Create Person model:
-        script/generate model person name:string
+    script/generate model person name:string
 
 6. Execute the migration:
-        rake db:migrate
+    rake db:migrate
 
 7. Create the Person controller:
-        script/generate controller person
+    script/generate controller person
 
 8. Create app/controllers/person_controller.rb:
-        class PersonController < ApplicationController
-          layout 'default'
-          active_scaffold :person
-        end
+    class PersonController < ApplicationController
+      layout 'default'
+      active_scaffold :person
+    end
 
 9. Create a default layout:
-        cp ../camur_backup/app/views/layouts/default.erb app/views/layouts
+    cp ../camur_backup/app/views/layouts/default.erb app/views/layouts
 
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -60,10 +60,10 @@ In this phase we'll create a simple scaffold with a single field.
         </html>
 
 10. Start a server in a new terminal.
-        script/server
+    script/server
 
 11. Visit person page.
-        http://localhost:3000/person
+    http://localhost:3000/person
 
 12, Review the show create, edit, show, search, delete options.
 
